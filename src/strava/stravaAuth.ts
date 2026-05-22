@@ -4,6 +4,7 @@
 import { stravaTokenResponseSchema } from '@/validation';
 import { status } from '@/ui/domHelpers';
 import { DEFAULT_STRAVA_CLIENT_ID } from '@/config/strava';
+import { backendUrl } from '@/config/backend';
 
 const CLIENT_ID    = (import.meta.env.VITE_STRAVA_CLIENT_ID as string | undefined) || DEFAULT_STRAVA_CLIENT_ID;
 const REDIRECT_URI = import.meta.env.VITE_STRAVA_REDIRECT_URI as string | undefined;
@@ -64,7 +65,7 @@ export function startOAuth(): void {
 
 async function exchangeCode(code: string): Promise<void> {
   const redirectUri = REDIRECT_URI || window.location.origin + window.location.pathname;
-  const res = await fetch('/api/strava/token', {
+  const res = await fetch(backendUrl('/api/strava/token'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ code, redirect_uri: redirectUri }),
@@ -98,7 +99,7 @@ export async function refreshToken(): Promise<string | null> {
   const refresh = localStorage.getItem(LS_REFRESH);
   if (!refresh) return null;
   try {
-    const res = await fetch('/api/strava/refresh', {
+    const res = await fetch(backendUrl('/api/strava/refresh'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refresh_token: refresh }),

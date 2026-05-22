@@ -4,6 +4,7 @@ import { status, setNum } from '@/ui/domHelpers';
 import { escapeHtml, fmtDuration, setBusy } from '@/utils';
 import { decodePolyline } from './routeGeometry';
 import { routeState } from '@/state/routeState';
+import { backendUrl } from '@/config/backend';
 import type { StravaSegment } from '@/types';
 
 interface NearestResult { dist: number; meters: number }
@@ -76,7 +77,7 @@ export function segmentRouteMatch(segment: Record<string, unknown>): SegmentMatc
 export async function fetchStravaStarredSegments(token: string): Promise<unknown[]> {
   const all: unknown[] = [];
   for (let page = 1; page <= 5; page++) {
-    const res = await fetch(`/api/strava/segments?page=${page}`, {
+    const res = await fetch(backendUrl(`/api/strava/segments?page=${page}`), {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!res.ok) throw new Error(`Strava HTTP ${res.status}`);

@@ -16,17 +16,16 @@ import { appStoreApi } from '@/state/useAppStore';
 import recordingState from '@/state/recordingState';
 import { livePeerArraySchema, livePeerSchema } from '@/validation';
 import { Store } from '@/state/store';
+import { BACKEND_BASE, backendUrl } from '@/config/backend';
 import type { ApiIceConfig, LivePeer } from '@/types';
 
-const serverOverride = (globalThis as unknown as Record<string, string>)['VELOX_SERVER'];
-// prefer explicit VITE_BACKEND_URL at build time, then environment override, then origin
-export const DEFAULT_SERVER = serverOverride || (import.meta.env.VITE_BACKEND_URL as string) || window.location.origin;
+export const DEFAULT_SERVER = BACKEND_BASE;
 
 export const makeId = (): string => Math.random().toString(36).slice(2, 8).toUpperCase();
 
 async function loadIceConfig(): Promise<void> {
   try {
-    const res = await fetch('/api/webrtc-config');
+    const res = await fetch(backendUrl('/api/webrtc-config'));
     if (!res.ok) return;
     const data = await res.json() as ApiIceConfig;
     if (Array.isArray(data.iceServers) && data.iceServers.length) {

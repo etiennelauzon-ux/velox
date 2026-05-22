@@ -249,17 +249,41 @@ io.on('connection', socket => {
     const client = clients.get(socket.id);
     if (!client?.room) return;
     try {
-      const lat = Number((raw as any).lat);
-      const lon = Number((raw as any).lon);
-      const ele = Number((raw as any).ele);
-      const speed = Math.max(0, Math.min(120, Number((raw as any).speed) || 0));
-      const power = Math.max(0, Math.min(3000, Number((raw as any).power) || 0));
-      const cadence = Math.max(0, Math.min(200, Number((raw as any).cadence) || 0));
-      const hr = Math.max(0, Math.min(250, Number((raw as any).hr) || 0));
-      const elapsed = Math.max(0, Number((raw as any).elapsed) || 0);
+      const payload = raw as Record<string, unknown>;
+      const lat = Number(payload.lat);
+      const lon = Number(payload.lon);
+      const ele = Number(payload.ele);
+      const speed = Math.max(0, Math.min(120, Number(payload.speed) || 0));
+      const power = Math.max(0, Math.min(3000, Number(payload.power) || 0));
+      const cadence = Math.max(0, Math.min(200, Number(payload.cadence) || 0));
+      const hr = Math.max(0, Math.min(250, Number(payload.hr) || 0));
+      const elapsed = Math.max(0, Number(payload.elapsed) || 0);
+      const routeDistance = Math.max(0, Number(payload.routeDistance) || 0);
+      const routeLen = Math.max(0, Number(payload.routeLen) || 0);
+      const routeName = typeof payload.routeName === 'string' ? payload.routeName.slice(0, 120) : '';
+      const recording = Boolean(payload.recording);
       if (!validateNumber(lat, -90, 90) || !validateNumber(lon, -180, 180)) return socket.emit('error', 'invalid location');
 
-      const sanitized = { id: socket.id, lat, lon, ele: isNaN(ele) ? 0 : ele, speed, power, cadence, hr, elapsed } as Record<string, unknown>;
+      const sanitized = {
+        id: socket.id,
+        room: client.room,
+        name: client.name,
+        color: client.color,
+        lat,
+        lon,
+        ele: isNaN(ele) ? 0 : ele,
+        speed,
+        power,
+        cadence,
+        hr,
+        elapsed,
+        routeDistance,
+        routeLen,
+        routeName,
+        recording,
+        updatedAt: Date.now(),
+      } as Record<string, unknown>;
+      clients.set(socket.id, { ...client, state: sanitized });
       socket.to(client.room).emit('peer:update', sanitized);
     } catch (e) {
       socket.emit('error', 'invalid payload');
