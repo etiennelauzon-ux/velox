@@ -1,0 +1,1 @@
+export const DEFAULT_STRAVA_CLIENT_ID = '105048';
