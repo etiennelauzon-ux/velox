@@ -1,8 +1,6 @@
 import 'dotenv/config';
 import express, { type Request, type Response } from 'express';
 import http from 'node:http';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit';
 import { Server as SocketIoServer } from 'socket.io';
@@ -197,12 +195,6 @@ app.get('/api/strava/segments', async (req: Request, res: Response) => {
     return res.status(500).json({ error: String(error) });
   }
 });
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../dist')));
-  app.get('*', (_req: Request, res: Response) => res.sendFile(path.join(__dirname, '../dist', 'index.html')));
-}
 
 const server = http.createServer(app);
 const io = new SocketIoServer(server, {
