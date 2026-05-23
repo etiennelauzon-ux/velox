@@ -87,14 +87,15 @@ export async function loadPresetRoute(): Promise<boolean> {
   const sel = document.getElementById('presetRoutes') as HTMLSelectElement | null;
   const val = sel?.value ?? '';
   if (!val) return false;
+  const displayName = sel?.selectedOptions?.[0]?.textContent?.trim() || `${val.toUpperCase()} Route`;
 
   status('Loading preset route...');
   try {
     const res = await fetch(`routes/${val}.gpx`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const { points, detectedName } = await parseGpxPointsOffThread(await res.text());
-    await finalizeRoute(points, detectedName || `${val.toUpperCase()} Route`);
-    status(`Loaded preset: ${val}`);
+    const { points } = await parseGpxPointsOffThread(await res.text());
+    await finalizeRoute(points, displayName);
+    status(`Loaded preset: ${displayName}`);
     return true;
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);

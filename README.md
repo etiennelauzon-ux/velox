@@ -19,7 +19,56 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:4173` in your browser.
+Open `http://localhost:5173` in your browser.
+
+## GitHub Pages
+
+The production frontend is served from GitHub Pages:
+
+https://etiennelauzon.github.io/velox/
+
+Pages is deployed by GitHub Actions from `main`, using `.github/workflows/deploy.yml`.
+The workflow builds the Vite app into `dist` and publishes that artifact with `actions/deploy-pages`.
+The repository Pages source should stay set to **GitHub Actions**.
+
+The backend is not served by GitHub Pages. It only provides `/api/*` endpoints and Socket.IO for:
+
+- Live room signaling and peer updates
+- WebRTC ICE configuration
+- Strava OAuth token exchange and refresh
+- Strava starred segment proxying
+- Mapillary proxy/token routes
+
+For the hosted frontend to reach the backend, set the repository or environment secret:
+
+```text
+VITE_BACKEND_URL=https://your-backend-host.example.com
+```
+
+Optional frontend build secrets:
+
+```text
+VITE_MAPILLARY_TOKEN=your_public_mapillary_token_if_used
+```
+
+Backend secrets belong only on the backend host, never in the GitHub Pages build:
+
+```text
+STRAVA_CLIENT_SECRET=...
+MAPILLARY_TOKEN=...
+TURN_URL=...
+TURN_USERNAME=...
+TURN_CREDENTIAL=...
+ALLOWED_ORIGINS=https://etiennelauzon.github.io,http://localhost:5173
+```
+
+To deploy a change:
+
+```bash
+git push origin main
+```
+
+Then check the "Deploy to GitHub Pages" workflow. A successful run updates the live site.
 
 ## Build
 

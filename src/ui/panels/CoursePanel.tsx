@@ -10,6 +10,15 @@ import {
 import { loadStravaStarredSegments } from '@/route/segments';
 import { loadPresetRoute, clearCourse } from '@/route/routeController';
 
+const PRESET_ROUTES = [
+  { value: 'CGV', label: '🇨🇦 CGV Route' },
+  { value: 'ProTour', label: '🇨🇦 Pro Tour du Mont-Royal' },
+  { value: 'Huez', label: '🇫🇷 Alpe d’Huez' },
+  { value: 'Ventoux', label: '🇫🇷 Mont Ventoux' },
+  { value: 'Patios', label: '🇨🇴 Alto de Patios' },
+  { value: 'Stelvio', label: '🇮🇹 Passo dello Stelvio' },
+];
+
 export default function CoursePanel() {
   const ui = useAppStore(state => state.ui);
   const trainer = useAppStore(state => state.trainer);
@@ -99,9 +108,9 @@ export default function CoursePanel() {
           <label>Preset Routes
             <select id="presetRoutes" className="compactInput" defaultValue="" onChange={() => void loadPresetRoute()}>
               <option value="">Select a preset route</option>
-              <option value="CGV">CGV Route</option>
-              <option value="Huez">Huez Route</option>
-              <option value="ProTour">Pro Tour du Mont-Royal</option>
+              {PRESET_ROUTES.map(route => (
+                <option key={route.value} value={route.value}>{route.label}</option>
+              ))}
             </select>
           </label>
         </div>
